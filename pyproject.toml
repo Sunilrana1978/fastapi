@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "sampleapp"
+version = "0.1.0"
+description = "sample app"
+authors = ["Sunil Kumar <sunil.kumar2@nike.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+uvicorn = "^0.13.4"
+fastapi = "^0.63.0"
+SQLAlchemy = "^1.4.7"
+passlib = "^1.7.4"
+bcrypt = "^3.2.0"
+python-jose = {extras = ["cryptography"], version = "^3.2.0"}
+python-multipart = "^0.0.5"
+mangum = "^0.11.0"
+boto3 = "^1.17.54"
+requests = "^2.25.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
