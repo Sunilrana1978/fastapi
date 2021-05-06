@@ -4,18 +4,12 @@ from boto3.dynamodb.conditions import Key
 import boto3
 from botocore.exceptions import ClientError
 from decimal import Decimal
+from .dynamodb import ddb
 
-# Let's use Amazon S3
-s3 = boto3.resource('s3')
+db=ddb("https://dynamodb.us-east-1.amazonaws.com","Movies")
+table=db.create_connection()
 
-dbb_url="https://dynamodb.us-east-1.amazonaws.com"
-
-def get_movie(year,title, dynamodb=None):
-    if not dynamodb:
-        dynamodb = boto3.resource('dynamodb', endpoint_url="https://dynamodb.us-east-1.amazonaws.com")
-
-    table = dynamodb.Table('Movies')
-
+def get_movie(year,title):
     try:
         response = table.get_item(Key={'year': year, 'title': title})   
         if 'Item' in response :
@@ -28,11 +22,7 @@ def get_movie(year,title, dynamodb=None):
     else:
         return result
 
-def put_movie(title, year, plot, rating, dynamodb=None):
-    if not dynamodb:
-        dynamodb = boto3.resource('dynamodb', endpoint_url="https://dynamodb.us-east-1.amazonaws.com")
-
-    table = dynamodb.Table('Movies')
+def put_movie(title, year, plot, rating):
     response = table.put_item(
        Item={
             'year': year,
@@ -45,12 +35,7 @@ def put_movie(title, year, plot, rating, dynamodb=None):
     )
     return response
 
-def delete_underrated_movie(year:int,title:str, dynamodb=None):
-    if not dynamodb:
-        dynamodb = boto3.resource('dynamodb', endpoint_url="https://dynamodb.us-east-1.amazonaws.com")
-     
-    table = dynamodb.Table('Movies')
-
+def delete_underrated_movie(year:int,title:str):
     try:
         response = table.delete_item(
             Key={
@@ -64,23 +49,14 @@ def delete_underrated_movie(year:int,title:str, dynamodb=None):
         return response
 
 
-def query_movies(year, dynamodb=None):
-    if not dynamodb:
-        dynamodb = boto3.resource('dynamodb', endpoint_url="https://dynamodb.us-east-1.amazonaws.com")
-
-    table = dynamodb.Table('Movies')
+def query_movies(year):
     response = table.query(
         KeyConditionExpression=Key('year').eq(year)
     )
     return response['Items']
 
 
-def update_movie(year,title, rating, plot, dynamodb=None):
-    if not dynamodb:
-        dynamodb = boto3.resource('dynamodb', endpoint_url="https://dynamodb.us-east-1.amazonaws.com")
-
-    table = dynamodb.Table('Movies')
-
+def update_movie(year,title, rating, plot):
     response = table.update_item(
         Key={
             'year': year,
@@ -95,11 +71,7 @@ def update_movie(year,title, rating, plot, dynamodb=None):
     )
     return response
 
-def load_movies(movies, dynamodb=None):
-    if not dynamodb:
-        dynamodb = boto3.resource('dynamodb', endpoint_url="https://dynamodb.us-east-1.amazonaws.com")
-
-    table = dynamodb.Table('Movies')
+def load_movies(movies):
     for movie in movies:
         year = movie["year"]
         title = movie["title"]
