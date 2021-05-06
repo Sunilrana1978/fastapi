@@ -1,16 +1,20 @@
+import json
+import os
+from decimal import Decimal
 from typing import List
-import json ,os
-from fastapi import APIRouter,HTTPException,FastAPI, File, UploadFile,Form
+
+from boto3.dynamodb.conditions import Key
+from fastapi import APIRouter, FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import HTMLResponse
 from starlette import status
-from boto3.dynamodb.conditions import Key
-from decimal import Decimal
-from ..repository import schemas ,movies
+
+from ..repository import movies, schemas
 
 router = APIRouter()
 
 import boto3
 from botocore.exceptions import ClientError
+
 
 @router.get("/",status_code=status.HTTP_200_OK)
 async def root(year:int,title:str):

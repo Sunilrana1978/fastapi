@@ -1,7 +1,9 @@
-from boto3.dynamodb.conditions import Key
-import boto3
-from botocore.exceptions import ClientError
 from decimal import Decimal
+
+import boto3
+from boto3.dynamodb.conditions import Key
+from botocore.exceptions import ClientError
+
 from .dynamodb import ddb
 
 db=ddb("https://dynamodb.us-east-1.amazonaws.com","single-table")
