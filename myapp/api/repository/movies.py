@@ -9,19 +9,6 @@ from .dynamodb import ddb
 db=ddb("https://dynamodb.us-east-1.amazonaws.com","Movies")
 table=db.create_connection()
 
-def get_movie(year,title):
-    try:
-        response = table.get_item(Key={'year': year, 'title': title})   
-        if 'Item' in response :
-            result=response['Item']
-        else:
-            result = False
-
-    except ClientError as e:
-        print(e.response['Error']['Message'])
-    else:
-        return result
-
 def put_movie(title, year, plot, rating):
     response = table.put_item(
        Item={
@@ -34,6 +21,19 @@ def put_movie(title, year, plot, rating):
         }
     )
     return response
+
+def get_movie(year,title):
+    try:
+        response = table.get_item(Key={'year': year, 'title': title})   
+        if 'Item' in response :
+            result=response['Item']
+        else:
+            result = False
+    except ClientError as e:
+        print(e.response['Error']['Message'])
+    else:
+        return result
+
 
 def delete_underrated_movie(year:int,title:str):
     try:

@@ -1,51 +1,48 @@
-# """
-# Example of using moto to mock out DynamoDB table
-# """
- 
-# import boto3
-# from moto import mock_dynamodb2
-# from fastapi.testclient import TestClient
-# from myapp.main import app
-# import store_data
- 
-# @mock_dynamodb2
-# def test_write_into_table():
-#     "Test the write_into_table with a valid input data"
-#     dynamodb = boto3.resource('dynamodb')
-#     table_name = 'Movies'
-#     table = dynamodb.create_table(TableName='Movies',
-#         KeySchema=[
-#             {
-#                 'AttributeName': 'year',
-#                 'KeyType': 'HASH'  # Partition key
-#             },
-#             {
-#                 'AttributeName': 'title',
-#                 'KeyType': 'RANGE'  # Sort key
-#             }
-#         ],
-#         AttributeDefinitions=[
-#             {
-#                 'AttributeName': 'year',
-#                 'AttributeType': 'N'
-#             },
-#             {
-#                 'AttributeName': 'title',
-#                 'AttributeType': 'S'
-#             },
 
-#         ])
+from pprint import pprint
+import unittest
+import boto3
+from botocore.exceptions import ClientError
+from moto import mock_dynamodb2
+
+@mock_dynamodb2
+class TestDatabaseFunctions(unittest.TestCase):
+    def setUp(self):
+        """Create the mock database and table"""
+        self.dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
+        
+        from myapp.api.repository.MoviesCreateTable import create_movie_table
+        self.table = create_movie_table(self.dynamodb) 
     
-#     data = {
-#         "year": 2016,"title": "Rush",
-#         "info": {
-#             "plot": "A re-creation of the merciless 1970s rivalry between Formula One rivals James Hunt and Niki Lauda.",
-#             "rating": 8.3
-#             }
-#         }
-#     store_data.write_into_table(data,table_name)
-#     response = table.get_item(Key={'date':data['date']})
-#     actual_output = response['Item']
-#     assert actual_output == data
+    def tearDown(self):
+        """Delete mock database and table after test is run"""
+        self.table.delete()
+        self.dynamodb=None
 
+    def test_table_exists(self):
+        self.assertTrue(self.table) # check if we got a result
+        self.assertIn('Movies', self.table.name) # check if the table name is 'Movies'
+        pprint(self.table.name)
 
+    def test_put_movie(self):
+        """Test the put function"""
+        from myapp.api.repository.movies import put_movie 
+
+        result = put_movie("The Big New Movie",2015,
+                           "Nothing happens at all.", 0)
+        
+        self.assertEqual(200, result['ResponseMetadata']['HTTPStatusCode'])
+        pprint(result)
+
+    def test_get_movie(self):
+       """Test the get function"""
+       from myapp.api.repository.movies import put_movie ,get_movie
+       result1 = put_movie("The Big New Movie",2015,
+                           "Nothing happens at all.", 0)
+       result = get_movie(2015,"The Big New Movie")
+
+       self.assertEqual(2015, result['year'])
+       self.assertEqual("The Big New Movie", result['title'])
+       self.assertEqual("Nothing happens at all.", result['info']['plot'])
+       self.assertEqual(0, result['info']['rating'])
+ 

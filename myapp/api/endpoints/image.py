@@ -1,24 +1,16 @@
-from fastapi import APIRouter,HTTPException
-from starlette import status
-from boto3.dynamodb.conditions import Key
 from typing import List
-from ..repository import schemas ,image
 
+from boto3.dynamodb.conditions import Key
+from fastapi import APIRouter, HTTPException
+from starlette import status
 
+from ..repository import image, schemas
 
 router = APIRouter()
 
 import boto3
 from botocore.exceptions import ClientError
 
-@router.get("/list_latest_images",status_code=status.HTTP_200_OK,
-    summary="Get list  of latest images", 
-    description="Get list  of latest images")
-async def root():
-    res_image = image.list_latest_images()
-    if not res_image:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f'No images found')
-    return res_image.get('Items')
 
 @router.post("/",status_code=status.HTTP_201_CREATED,
     summary="Create a new Image",
@@ -31,6 +23,15 @@ async def root(request:List[schemas.image]):
     for item in request:
         image_resp = image.create_image(item.image_name , item.image_id,item.attributes,item.create_dt)
     return {"Record Saved"}
+
+@router.get("/list_latest_images",status_code=status.HTTP_200_OK,
+    summary="Get list  of latest images", 
+    description="Get list  of latest images")
+async def root():
+    res_image = image.list_latest_images()
+    if not res_image:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f'No images found')
+    return res_image.get('Items')
 
 
 @router.get("/get_latest_image_by_name",status_code=status.HTTP_200_OK)
