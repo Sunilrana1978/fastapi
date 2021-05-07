@@ -49,13 +49,17 @@ def delete_underrated_movie(year:int,title:str):
     else:
         return response
 
-
-
 def query_movies(year):
     response = table.query(
         KeyConditionExpression=Key('year').eq(year)
     )
-    return response.json()['Items']
+    return response['Items']
+
+# def query_movies(year):
+#     response = table.query(
+#         KeyConditionExpression=Key('year').eq(year)
+#     )
+#     return response.json()['Items']
 
 def update_movie(year,title, rating, plot):
     response = table.update_item(
