@@ -1,3 +1,4 @@
+import json
 from fastapi import APIRouter,HTTPException
 from starlette import status
 from boto3.dynamodb.conditions import Key
@@ -49,12 +50,12 @@ def delete_underrated_movie(year:int,title:str):
         return response
 
 
+
 def query_movies(year):
     response = table.query(
         KeyConditionExpression=Key('year').eq(year)
     )
-    return response['Items']
-
+    return response.json()['Items']
 
 def update_movie(year,title, rating, plot):
     response = table.update_item(

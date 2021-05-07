@@ -1,6 +1,7 @@
-
+import simplejson as json
 from pprint import pprint
 import unittest
+from unittest import mock
 import boto3
 from botocore.exceptions import ClientError
 from moto import mock_dynamodb2
@@ -45,4 +46,27 @@ class TestDatabaseFunctions(unittest.TestCase):
        self.assertEqual("The Big New Movie", result['title'])
        self.assertEqual("Nothing happens at all.", result['info']['plot'])
        self.assertEqual(0, result['info']['rating'])
- 
+
+
+@mock.patch("myapp.api.repository.movies.table.query") 
+def test_get_movie_api(mock_requests_get):
+    expeted_response={
+        'Items':[
+            {
+            "year": 2015,
+            "info": {
+                "rating": 0,
+                "plot": "Nothing happens at all."
+            },
+            "title": "The Big New Movie"}
+        ]
+    }
+    mock_requests_get.return_value = mock.Mock(name="mock response",
+                                               **{"status_code": 200, "json.return_value": expeted_response})
+    from fastapi.testclient import TestClient
+    from myapp.main import app
+    client = TestClient(app)   
+    response = client.get("/v1/movies/2015")
+    
+    assert response.status_code == 200
+    assert response.json() == expeted_response['Items']
