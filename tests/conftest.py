@@ -1,5 +1,5 @@
-import pytest
-
+import pytest 
+from fastapi import  Request
 class Movie:
 
     def __init__(self, title, year, plot, rating):
@@ -9,7 +9,9 @@ class Movie:
         self.rating = rating
 
 
-# @pytest.fixture(scope='session', autouse=True)
-def put_Movies_str():
-    return Movie("The Big New Movie",2015,
+@pytest.fixture(scope="class")
+def put_Movies_str(request: Request):
+    request.cls.put_Movies_str = Movie("The Big New Movie",2015,
                            "Nothing happens at all.", 0)
+    
+

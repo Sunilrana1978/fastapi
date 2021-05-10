@@ -8,9 +8,9 @@ import simplejson as json
 from botocore.exceptions import ClientError
 from moto import mock_dynamodb2
 
-from .conftest import put_Movies_str
+
 @mock_dynamodb2
-# @pytest.mark.usefixtures("put_Movies_str")
+@pytest.mark.usefixtures('put_Movies_str')
 class TestDatabaseFunctions(unittest.TestCase):
     
     def setUp(self):
@@ -56,25 +56,20 @@ class TestDatabaseFunctions(unittest.TestCase):
         self.assertEqual(200, result['ResponseMetadata']['HTTPStatusCode'])
         pprint(result)
 
-    # @pytest.mark.usefixtures("put_Movies_str")
     def test_21_put_movie(self):
         """Test the put function"""
         from myapp.api.repository.movies import put_movie 
 
-        put_Movies_str1=put_Movies_str()
-
-        result = put_movie(put_Movies_str1.title,put_Movies_str1.year,put_Movies_str1.plot,put_Movies_str1.rating)
-        # # put_Movies_str=self.put_Movies_str
-        # result = put_movie(self.title,put_Movies_str.year,put_Movies_str.plot,put_Movies_str.rating)
-        
+        result = put_movie(self.put_Movies_str.title,self.put_Movies_str.year,self.put_Movies_str.plot,self.put_Movies_str.rating)
         self.assertEqual(200, result['ResponseMetadata']['HTTPStatusCode'])
         pprint(result)
 
     def test_3_get_movie(self):
        """Test the get function"""
        from myapp.api.repository.movies import get_movie, put_movie
-       put_movie("The Big New Movie",2015,
-                           "Nothing happens at all.", 0)
+
+       put_movie(self.put_Movies_str.title,self.put_Movies_str.year,self.put_Movies_str.plot,self.put_Movies_str.rating)
+
        result = get_movie(2015,"The Big New Movie")
 
        self.assertEqual(2015, result['year'])
@@ -85,8 +80,7 @@ class TestDatabaseFunctions(unittest.TestCase):
     def test_4_get_movie_with_year(self):
         """Test the get api with path parameter function"""
         from myapp.api.repository.movies import get_movie, put_movie
-        put_movie("The Big New Movie",2015,
-                           "Nothing happens at all.", 0)
+        put_movie(self.put_Movies_str.title,self.put_Movies_str.year,self.put_Movies_str.plot,self.put_Movies_str.rating)
          
         response = self.client.get("/v1/movies/2015")
         assert response.status_code == 200
@@ -95,8 +89,7 @@ class TestDatabaseFunctions(unittest.TestCase):
     def test_4_get_movie_with_year_not_exists(self):
         """Test the get api with path parameter function"""
         from myapp.api.repository.movies import get_movie, put_movie
-        put_movie("The Big New Movie",2015,
-                           "Nothing happens at all.", 0)
+        put_movie(self.put_Movies_str.title,self.put_Movies_str.year,self.put_Movies_str.plot,self.put_Movies_str.rating)
    
         response = self.client.get("/v1/movies/2016")
         assert response.status_code == 404
@@ -104,17 +97,16 @@ class TestDatabaseFunctions(unittest.TestCase):
     def test_5_get_movie_with_year_title(self):
         """Test the get api with path parameter function"""
         from myapp.api.repository.movies import get_movie, put_movie
-        put_movie("The Big New Movie",2015,
-                           "Nothing happens at all.", 0)
+        put_movie(self.put_Movies_str.title,self.put_Movies_str.year,self.put_Movies_str.plot,self.put_Movies_str.rating)
 
         response = self.client.get("/v1/movies/?year=2015&title=The Big New Movie")
         assert response.status_code == 200
         assert response.json() == self.expeted_response['Items'][0]
+
     def test_5_get_movie_with_year_title_not_exists(self):
         """Test the get api with path parameter function"""
         from myapp.api.repository.movies import get_movie, put_movie
-        put_movie("The Big New Movie",2015,
-                           "Nothing happens at all.", 0)
+        put_movie(self.put_Movies_str.title,self.put_Movies_str.year,self.put_Movies_str.plot,self.put_Movies_str.rating)
  
         response = self.client.get("/v1/movies/?year=2016&title=The Big New Movie")
         assert response.status_code == 404
@@ -123,8 +115,7 @@ class TestDatabaseFunctions(unittest.TestCase):
         """Test the delete api with query parameter function"""
         from myapp.api.repository.movies import get_movie, put_movie,delete_underrated_movie
 
-        put_movie("The Big New Movie",2015,
-                           "Nothing happens at all.", 0)
+        put_movie(self.put_Movies_str.title,self.put_Movies_str.year,self.put_Movies_str.plot,self.put_Movies_str.rating)
         
         Delete_response = self.client.delete("/v1/movies/?year=2016&title=The Big New Movie")
 
@@ -146,25 +137,4 @@ class TestDatabaseFunctions(unittest.TestCase):
         response = self.client.get("/v1/movies/?year=2025&title=Hum tum")
         assert response.status_code == 200
 
-    # @mock.patch("myapp.api.repository.movies.table.query") 
-    # def test_4_get_movie_api(self,mock_requests_get):
-    #     expeted_response={
-    #         'Items':[
-    #             {
-    #             "year": 2015,
-    #             "info": {
-    #                 "rating": 0,
-    #                 "plot": "Nothing happens at all."
-    #             },
-    #             "title": "The Big New Movie"}
-    #         ]
-    #     }
-    #     mock_requests_get.return_value = mock.Mock(name="mock response",
-    #                                             **{"status_code": 200, "json.return_value": expeted_response})
-    #     from fastapi.testclient import TestClient
-    #     from myapp.main import app
-    #     client = TestClient(app)   
-    #     response = client.get("/v1/movies/2015")
-        
-    #     assert response.status_code == 200
-    #     assert response.json() == expeted_response['Items']
+ 
