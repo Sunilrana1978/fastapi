@@ -1,3 +1,4 @@
+import json
 from fastapi import APIRouter,HTTPException
 from starlette import status
 from boto3.dynamodb.conditions import Key
@@ -9,20 +10,7 @@ from .dynamodb import ddb
 db=ddb("https://dynamodb.us-east-1.amazonaws.com","Movies")
 table=db.create_connection()
 
-def get_movie(year,title):
-    try:
-        response = table.get_item(Key={'year': year, 'title': title})   
-        if 'Item' in response :
-            result=response['Item']
-        else:
-            result = False
-
-    except ClientError as e:
-        print(e.response['Error']['Message'])
-    else:
-        return result
-
-def put_movie(title, year, plot, rating):
+def put_movie(title:str, year:int, plot:str, rating:float) -> dict:
     response = table.put_item(
        Item={
             'year': year,
@@ -35,7 +23,20 @@ def put_movie(title, year, plot, rating):
     )
     return response
 
-def delete_underrated_movie(year:int,title:str):
+def get_movie(year:int,title:str) -> dict:
+    try:
+        response = table.get_item(Key={'year': year, 'title': title})   
+        if 'Item' in response :
+            result=response['Item']
+        else:
+            result = False
+    except ClientError as e:
+        print(e.response['Error']['Message'])
+    else:
+        return result
+
+
+def delete_underrated_movie(year:int,title:str) -> dict:
     try:
         response = table.delete_item(
             Key={
@@ -48,15 +49,13 @@ def delete_underrated_movie(year:int,title:str):
     else:
         return response
 
-
-def query_movies(year):
+def query_movies(year:int) -> dict:
     response = table.query(
         KeyConditionExpression=Key('year').eq(year)
     )
     return response['Items']
 
-
-def update_movie(year,title, rating, plot):
+def update_movie(year:int,title:str, rating:float, plot:str) -> dict:
     response = table.update_item(
         Key={
             'year': year,

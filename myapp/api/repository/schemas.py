@@ -2,8 +2,8 @@ from pydantic import BaseModel
 from datetime import date, datetime, time, timedelta
 
 class movie_info(BaseModel):
-    plot: str
-    rating: int
+    plot: str = " "
+    rating: int 
 
 class movie(BaseModel):
     year: int

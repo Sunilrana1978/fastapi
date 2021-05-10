@@ -1,19 +1,23 @@
+import simplejson as json
+import os
+from decimal import Decimal
 from typing import List
-import json ,os
-from fastapi import APIRouter,HTTPException,FastAPI, File, UploadFile,Form
+
+from boto3.dynamodb.conditions import Key
+from fastapi import APIRouter, FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import HTMLResponse
 from starlette import status
-from boto3.dynamodb.conditions import Key
-from decimal import Decimal
-from ..repository import schemas ,movies
+
+from ..repository import movies, schemas
 
 router = APIRouter()
 
 import boto3
 from botocore.exceptions import ClientError
 
+
 @router.get("/",status_code=status.HTTP_200_OK)
-async def root(year:int,title:str):
+async def root(year:int,title:str) -> dict:
     movie = movies.get_movie(year,title)
     if not movie:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f'The Movies with year {year} and title {title} not found')
@@ -22,27 +26,27 @@ async def root(year:int,title:str):
     return movie
 
 @router.post("/",status_code=status.HTTP_201_CREATED)
-async def root(request:List[schemas.movie]):
+async def root(request:List[schemas.movie])->str:
     for item in request:
         movie_resp = movies.put_movie(item.title , item.year,item.info.plot,item.info.rating)
     return {"Record Saved"}
 
 @router.delete("/")
-async def root(year:int,title:str):
+async def root(year:int,title:str) -> dict:
     delete_response = movies.delete_underrated_movie(year,title)
     if not delete_response:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f'The Movies with year {year} and title {title} not found')
     return  {"Record deleted":delete_response}
 
 @router.get("/{year}",status_code=status.HTTP_200_OK)
-async def root(year:int):
+async def root(year:int) -> dict:
     movie = movies.query_movies(year)
     if not movie:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f'The Movies with year {year}  not found')
     return movie
 
 @router.put("/", status_code=status.HTTP_202_ACCEPTED)
-async def root(request:schemas.movie):
+async def root(request:schemas.movie)->str:
     update_response = movies.update_movie(request.year,request.title, request.info.rating, request.info.plot)
     if update_response:
         print("Delete movie succeeded:")

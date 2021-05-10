@@ -1,15 +1,24 @@
-from fastapi import APIRouter,HTTPException
-from starlette import status
-from boto3.dynamodb.conditions import Key
 from typing import List
-from ..repository import schemas ,image
 
+from boto3.dynamodb.conditions import Key
+from fastapi import APIRouter, HTTPException
+from starlette import status
 
+from ..repository import image, schemas
 
 router = APIRouter()
 
 import boto3
 from botocore.exceptions import ClientError
+
+
+@router.post("/",status_code=status.HTTP_201_CREATED,
+    summary="Create a new Image",
+    description="Create a new Image and Increment Version or create new image")
+async def root(request:List[schemas.image]):
+    for item in request:
+        image_resp = image.create_image(item.image_name , item.image_id,item.attributes,item.create_dt)
+    return {"Record Saved"}
 
 @router.get("/list_latest_images",status_code=status.HTTP_200_OK,
     summary="Get list  of latest images", 
@@ -20,20 +29,10 @@ async def root():
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f'No images found')
     return res_image.get('Items')
 
-@router.post("/",status_code=status.HTTP_201_CREATED,
-    summary="Create a new Image",
-    description="Create a new Image and Increment Version or create new image")
-async def root(request:List[schemas.image]):
-    """
-    1. Check for the image (exists) => pk(image_name), sk.begins_with("v_")
-    2. Increment Version or create new image
-    """
-    for item in request:
-        image_resp = image.create_image(item.image_name , item.image_id,item.attributes,item.create_dt)
-    return {"Record Saved"}
 
-
-@router.get("/get_latest_image_by_name",status_code=status.HTTP_200_OK)
+@router.get("/get_latest_image_by_name",status_code=status.HTTP_200_OK,
+    summary="Get list  of images by name", 
+    description="et list  of images by name")
 async def root(image_name:str):
     res_image = image.get_latest_image_by_name(image_name)
     if not res_image.get('Item'):
@@ -43,7 +42,9 @@ async def root(image_name:str):
     return  res_image.get('Item')
 
 
-@router.get("/get_specific_image_by_name_and_version",status_code=status.HTTP_200_OK)
+@router.get("/get_specific_image_by_name_and_version",status_code=status.HTTP_200_OK,
+    summary="Get list  of images by name and version", 
+    description="Get list  of images by name and version")
 async def root(image_name:str,version:int):
     res_image = image.get_specific_image_by_name_and_version(image_name,version)
     if not res_image.get('Item'):
