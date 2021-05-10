@@ -16,10 +16,6 @@ from botocore.exceptions import ClientError
     summary="Create a new Image",
     description="Create a new Image and Increment Version or create new image")
 async def root(request:List[schemas.image]):
-    """
-    1. Check for the image (exists) => pk(image_name), sk.begins_with("v_")
-    2. Increment Version or create new image
-    """
     for item in request:
         image_resp = image.create_image(item.image_name , item.image_id,item.attributes,item.create_dt)
     return {"Record Saved"}
@@ -34,7 +30,9 @@ async def root():
     return res_image.get('Items')
 
 
-@router.get("/get_latest_image_by_name",status_code=status.HTTP_200_OK)
+@router.get("/get_latest_image_by_name",status_code=status.HTTP_200_OK,
+    summary="Get list  of images by name", 
+    description="et list  of images by name")
 async def root(image_name:str):
     res_image = image.get_latest_image_by_name(image_name)
     if not res_image.get('Item'):
@@ -44,7 +42,9 @@ async def root(image_name:str):
     return  res_image.get('Item')
 
 
-@router.get("/get_specific_image_by_name_and_version",status_code=status.HTTP_200_OK)
+@router.get("/get_specific_image_by_name_and_version",status_code=status.HTTP_200_OK,
+    summary="Get list  of images by name and version", 
+    description="Get list  of images by name and version")
 async def root(image_name:str,version:int):
     res_image = image.get_specific_image_by_name_and_version(image_name,version)
     if not res_image.get('Item'):

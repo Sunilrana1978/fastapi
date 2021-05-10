@@ -10,7 +10,7 @@ from .dynamodb import ddb
 db=ddb("https://dynamodb.us-east-1.amazonaws.com","Movies")
 table=db.create_connection()
 
-def put_movie(title, year, plot, rating):
+def put_movie(title:str, year:int, plot:str, rating:float) -> dict:
     response = table.put_item(
        Item={
             'year': year,
@@ -23,7 +23,7 @@ def put_movie(title, year, plot, rating):
     )
     return response
 
-def get_movie(year,title):
+def get_movie(year:int,title:str) -> dict:
     try:
         response = table.get_item(Key={'year': year, 'title': title})   
         if 'Item' in response :
@@ -36,7 +36,7 @@ def get_movie(year,title):
         return result
 
 
-def delete_underrated_movie(year:int,title:str):
+def delete_underrated_movie(year:int,title:str) -> dict:
     try:
         response = table.delete_item(
             Key={
@@ -49,19 +49,13 @@ def delete_underrated_movie(year:int,title:str):
     else:
         return response
 
-def query_movies(year):
+def query_movies(year:int) -> dict:
     response = table.query(
         KeyConditionExpression=Key('year').eq(year)
     )
     return response['Items']
 
-# def query_movies(year):
-#     response = table.query(
-#         KeyConditionExpression=Key('year').eq(year)
-#     )
-#     return response.json()['Items']
-
-def update_movie(year,title, rating, plot):
+def update_movie(year:int,title:str, rating:float, plot:str) -> dict:
     response = table.update_item(
         Key={
             'year': year,
