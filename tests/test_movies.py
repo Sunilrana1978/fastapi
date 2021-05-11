@@ -1,3 +1,4 @@
+import json
 import unittest
 from pprint import pprint
 from unittest import mock
@@ -7,6 +8,7 @@ import pytest
 import simplejson as json
 from botocore.exceptions import ClientError
 from moto import mock_dynamodb2
+
 
 @mock_dynamodb2
 @pytest.mark.usefixtures('put_Movies_str')
@@ -21,12 +23,12 @@ class TestDatabaseFunctions(unittest.TestCase):
         self.expeted_response={
             'Items':[
                 {
-                "year": 2015,
+                "year": self.put_Movies_str.year,
                 "info": {
-                    "rating": 0,
-                    "plot": "Nothing happens at all."
+                    "rating": self.put_Movies_str.rating,
+                    "plot": self.put_Movies_str.plot
                 },
-                "title": "The Big New Movie"}
+                "title":self.put_Movies_str.title}
             ]
         }
         """create fastapi test clinet"""
@@ -110,7 +112,8 @@ class TestDatabaseFunctions(unittest.TestCase):
     
     def test_6_delete_movie_with_year_title(self)->None:
         """Test the delete api with query parameter function"""
-        from myapp.api.repository.movies import get_movie, put_movie,delete_underrated_movie
+        from myapp.api.repository.movies import (delete_underrated_movie,
+                                                 get_movie, put_movie)
 
         put_movie(self.put_Movies_str.title,self.put_Movies_str.year,self.put_Movies_str.plot,self.put_Movies_str.rating)
         
@@ -123,11 +126,20 @@ class TestDatabaseFunctions(unittest.TestCase):
 
     def test_7_post_movie(self)->None:
         """Test the delete api with query parameter function"""
-        from myapp.api.repository.movies import get_movie, put_movie,delete_underrated_movie
+        from myapp.api.repository.movies import (delete_underrated_movie,
+                                                 get_movie, put_movie)
 
-        payload =[ {"year": self.put_Movies_str.year, "title": self.put_Movies_str.title,"info": {"plot": "love story","rating": 3.5}}]
+        payload =[ {"year": self.put_Movies_str.year,
+                    "title": self.put_Movies_str.title,
+                    "info": {
+                        "plot": self.put_Movies_str.plot,
+                        "rating": self.put_Movies_str.rating}
+                    }
+                ]
 
-        post_response = self.client.post("/v1/movies/",json=payload)
+        payload=json.dumps(payload)
+
+        post_response = self.client.post("/v1/movies/",data=payload)
         
         assert post_response.status_code == 201
 
