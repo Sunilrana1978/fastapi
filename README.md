@@ -13,3 +13,5 @@ Resources:
     2. https://python-poetry.org/docs/basic-usage/
     3. https://pypi.org/project/mangum/
     4. How to deploy code to api and Lambda : https://www.youtube.com/watch?v=6fE31084Uks
+
+
