@@ -1,9 +1,11 @@
 # Run project
 
-    1. Create Dynamodb table:  Use the table struture mentioned at [link](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GettingStarted.Python.01.html)
-    2. Initalised the poetry : poetry init
-    3. Start shell if not active any :  poetry shell
-    4. python -m  uvicorn myapp.main:app --reload --port 8000
+    1. Create Dynamodb table. Use link below.
+   [Create table](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GettingStarted.Python.01.html)
+   
+    3. Initalised the poetry : poetry init
+    4. Start shell if not active any :  poetry shell
+    5. python -m  uvicorn myapp.main:app --reload --port 8000
 
 # Run pytest:
 
