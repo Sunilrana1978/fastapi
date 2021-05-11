@@ -15,11 +15,14 @@ from moto import mock_dynamodb2
 class TestDatabaseFunctions(unittest.TestCase):
     
     def setUp(self)->None:
-        """Create the mock database and table"""
-        self.dynamodb = boto3.resource('dynamodb', region_name='us-east-1')       
+        """Setup function to create the database and global variable """
+        #Create the mock database and table
+        self.dynamodb = boto3.resource('dynamodb', region_name='us-east-1')   
+        #create the table    
         from myapp.api.repository.MoviesCreateTable import create_movie_table
-
         self.table = create_movie_table(self.dynamodb) 
+
+        # Create variable to store the expected output for testcase validation
         self.expeted_response={
             'Items':[
                 {
@@ -31,14 +34,14 @@ class TestDatabaseFunctions(unittest.TestCase):
                 "title":self.put_Movies_str.title}
             ]
         }
-        """create fastapi test clinet"""
+        #create fastapi test clinet
         from fastapi.testclient import TestClient
         from myapp.main import app
         self.client = TestClient(app)  
 
-    """
-    start: Testing the dynamodb operation directly 
-    """
+   
+    # start: Testing the dynamodb operation directly 
+
     def tearDown(self)->None:
         """Delete mock database and table after test is run"""
         self.table.delete()
@@ -69,13 +72,13 @@ class TestDatabaseFunctions(unittest.TestCase):
        self.assertEqual(self.put_Movies_str.year, result['year'])
        self.assertEqual(self.put_Movies_str.title, result['title'])
 
-    """
-    End: Testing the dynamodb operation directly 
-    """
+ 
+    # End: Testing the dynamodb operation directly 
+    
 
-    """
-    start: Testing the Api end points 
-    """
+    
+    # start: Testing the Api end points 
+   
     def test_4_get_movie_with_year(self)->None:
         """Test the get api with path parameter function"""
         from myapp.api.repository.movies import get_movie, put_movie
@@ -145,6 +148,6 @@ class TestDatabaseFunctions(unittest.TestCase):
 
         response = self.client.get(f"/v1/movies/?year={self.put_Movies_str.year}&title={self.put_Movies_str.title}")
         assert response.status_code == 200
-    """
-    End: Testing the Api end points 
-    """
+    
+    #End: Testing the Api end points 
+    
