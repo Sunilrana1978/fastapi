@@ -9,7 +9,6 @@ import simplejson as json
 from botocore.exceptions import ClientError
 from moto import mock_dynamodb2
 
-
 @mock_dynamodb2
 @pytest.mark.usefixtures('put_Movies_str')
 class TestDatabaseFunctions(unittest.TestCase):
@@ -76,7 +75,6 @@ class TestDatabaseFunctions(unittest.TestCase):
     # End: Testing the dynamodb operation directly 
     
 
-    
     # start: Testing the Api end points 
    
     def test_4_get_movie_with_year(self)->None:

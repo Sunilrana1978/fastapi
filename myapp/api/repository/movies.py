@@ -7,8 +7,10 @@ from botocore.exceptions import ClientError
 from decimal import Decimal
 from .dynamodb import ddb
 
-db=ddb("https://dynamodb.us-east-1.amazonaws.com","Movies")
-table=db.create_connection()
+# db=ddb("https://dynamodb.us-east-1.amazonaws.com","Movies")
+# table=db.create_connection()
+db=ddb("Movies")
+table=db.gettable
 
 def put_movie(title:str, year:int, plot:str, rating:float) -> dict:
     response = table.put_item(
@@ -34,7 +36,6 @@ def get_movie(year:int,title:str) -> dict:
         print(e.response['Error']['Message'])
     else:
         return result
-
 
 def delete_underrated_movie(year:int,title:str) -> dict:
     try:

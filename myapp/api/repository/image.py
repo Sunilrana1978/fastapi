@@ -6,8 +6,8 @@ from botocore.exceptions import ClientError
 
 from .dynamodb import ddb
 
-db=ddb("https://dynamodb.us-east-1.amazonaws.com","single-table")
-table=db.create_connection()
+db=ddb("single-table")
+table=db.gettable
 
 def create_image(image_name, image_id,attributes,create_dt):
     """
