@@ -7,6 +7,8 @@
     3. Initalised the poetry : poetry install
     4. Start shell if not active any :  poetry shell
     5. python -m  uvicorn myapp.main:app --reload --port 8000
+# Select and activate an environment
+    https://code.visualstudio.com/docs/python/environments#:~:text=version%204.4%2B).-,To%20do%20so%2C%20open%20the%20Command%20Palette%20(Ctrl%2BShift,Settings%2C%20with%20the%20appropriate%20path.
 
 # Run pytest:
 
