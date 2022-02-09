@@ -1,4 +1,4 @@
 def demo:
-    print("Git Demo  test!")
+    print("Git Demo!")
 
 demo()
