@@ -9,6 +9,6 @@ class ddb:
      
     def create_connection(self):
         dbb_url=self.dbb_url
-        dynamodb = boto3.resource('dynamodb', endpoint_url=dbb_url)
+        dynamodb = boto3.resource('dynamodb', endpoint_url=dbb_url , region_name='us-east-1')
         table = dynamodb.Table(self.table_name)
         return table
